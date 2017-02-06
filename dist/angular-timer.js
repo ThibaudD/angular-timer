@@ -14,7 +14,6 @@ var timerModule = angular.module('timer', [])
       replace: false,
       scope: {
         interval: '=interval',
-        startTimeAttr: '=startTime',
         endTimeAttr: '=endTime',
         countdownattr: '=countdown',
         finishCallback: '&finishCallback',
@@ -81,8 +80,12 @@ var timerModule = angular.module('timer', [])
         $scope.countdown = angular.isNumber($scope.countdownattr) && parseInt($scope.countdownattr, 10) >= 0 ? parseInt($scope.countdownattr, 10) : undefined;
         $scope.isRunning = false;
 
-        $scope.$on('timer-start', function () {
-          $scope.start();
+        $scope.$on('timer-start', function (event, args) {
+          var startTime = moment();
+          if (args.hasOwnProperty('startTime') && args.startTime) {
+            startTime = args.startTime;
+          }
+          $scope.start(startTime);
         });
 
         $scope.$on('timer-resume', function () {
@@ -123,8 +126,8 @@ var timerModule = angular.module('timer', [])
           }
         });
 
-        $scope.start = $element[0].start = function () {
-          $scope.startTime = $scope.startTimeAttr ? moment($scope.startTimeAttr) : moment();
+        $scope.start = $element[0].start = function (startTime) {
+          $scope.startTime = startTime ? moment(startTime) : moment();
           $scope.endTime = $scope.endTimeAttr ? moment($scope.endTimeAttr) : null;
           if (!angular.isNumber($scope.countdown)) {
             $scope.countdown = angular.isNumber($scope.countdownattr) && parseInt($scope.countdownattr, 10) > 0 ? parseInt($scope.countdownattr, 10) : undefined;
